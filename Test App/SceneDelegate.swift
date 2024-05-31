@@ -20,8 +20,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let window = UIWindow(windowScene: windowScene)
                 
                 // Set the root view controller to WelcomeViewController
-                let welcomeViewController = StartViewController()
-               let navigationController = UINavigationController(rootViewController: welcomeViewController )
+                let welcomeViewController = ViewController()
+                //let welcomeViewController = TestVC()
+                let navigationController = UINavigationController(rootViewController: welcomeViewController )
                 window.rootViewController = navigationController
                 
                 // Make the window visible

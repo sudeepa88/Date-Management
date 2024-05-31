@@ -7,5 +7,6 @@ target 'Test App' do
 
   # Pods for Test App
     pod 'RealmSwift', '~>10'
+    pod 'FSCalendar'
 
 end

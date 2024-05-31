@@ -9,7 +9,7 @@ import UIKit
 
 class ShowViewController: UIViewController {
     
-    var contactDetails : TaskFile?
+    var contactDetails : NewTask?
     
     let titleTextField: UITextField = {
         let textField = UITextField()
@@ -53,6 +53,24 @@ class ShowViewController: UIViewController {
         textLabel.translatesAutoresizingMaskIntoConstraints = false
         return textLabel
     }()
+    
+    let startTimeTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Start Time"
+        textField.borderStyle = .roundedRect
+        textField.isUserInteractionEnabled = false
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    let endTimeTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "End Time"
+        textField.borderStyle = .roundedRect
+        textField.isUserInteractionEnabled = false
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -60,16 +78,20 @@ class ShowViewController: UIViewController {
         view.backgroundColor = .white
         // Do any additional setup after loading the view.
         
-        let cancelButton = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(cancelButtonTapped))
-        cancelButton.tintColor = UIColor.red
-        
-        navigationItem.leftBarButtonItem = cancelButton
+//        let cancelButton = UIBarButtonItem(title: "Back", style: .plain, target: self, action: #selector(cancelButtonTapped))
+//        cancelButton.tintColor = UIColor.red
+//        
+//        navigationItem.leftBarButtonItem = cancelButton
         
         view.addSubview(titleTextField)
         view.addSubview(locationTextField)
         view.addSubview(dateTextField)
         view.addSubview(textViewFirst)
         view.addSubview(textLabelView)
+        
+        
+        view.addSubview(startTimeTextField)
+        view.addSubview(endTimeTextField)
         
         setupUI()
         
@@ -78,6 +100,8 @@ class ShowViewController: UIViewController {
     }
     @objc func dismissKeyboard() {
             view.endEditing(true)
+       
+        
         }
     
     func setupUI() {
@@ -105,15 +129,29 @@ class ShowViewController: UIViewController {
             textViewFirst.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -200),
             
             
-            textLabelView.topAnchor.constraint(equalTo: dateTextField.bottomAnchor, constant: 100),
+            textLabelView.topAnchor.constraint(equalTo: endTimeTextField.bottomAnchor, constant: 50),
             textLabelView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             textLabelView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             textLabelView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            
+            startTimeTextField.topAnchor.constraint(equalTo: dateTextField.bottomAnchor, constant: 10),
+            startTimeTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            startTimeTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            startTimeTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            startTimeTextField.heightAnchor.constraint(equalToConstant: 40),
+            
+            endTimeTextField.topAnchor.constraint(equalTo: startTimeTextField.bottomAnchor, constant: 10),
+            endTimeTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            endTimeTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            endTimeTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            endTimeTextField.heightAnchor.constraint(equalToConstant: 40),
             
         ])
     }
     
     @objc func cancelButtonTapped() {
-            self.dismiss(animated: true, completion: nil)
+        self.dismiss(animated: true, completion: nil)
+//        let backNavigationController = ViewController()
+//        navigationController?.pushViewController(backNavigationController, animated: true)
         }
 }

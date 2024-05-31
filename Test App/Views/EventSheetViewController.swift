@@ -9,8 +9,13 @@ import UIKit
 import RealmSwift
 
 class EventSheetViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate{
+    
     let realm = try! Realm()
     public var completionHandler: (() -> Void)?
+    
+    var startTime: String = ""
+    var endTime: String = ""
+    
     let titleTextField: UITextField = {
         let textField = UITextField()
         textField.placeholder = "Title"
@@ -60,6 +65,41 @@ class EventSheetViewController: UIViewController, UITextFieldDelegate, UITextVie
     }()
 
     
+    let startTimeTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "Start Time"
+        textField.borderStyle = .roundedRect
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    let endTimeTextField: UITextField = {
+        let textField = UITextField()
+        textField.placeholder = "End Time"
+        textField.borderStyle = .roundedRect
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        return textField
+    }()
+    
+    
+    let startDatePicker: UIDatePicker = {
+            let picker = UIDatePicker()
+            picker.datePickerMode = .time
+            picker.preferredDatePickerStyle = .compact
+            picker.addTarget(self, action: #selector(dateChanged(_:)), for: .valueChanged)
+            picker.translatesAutoresizingMaskIntoConstraints = false
+            return picker
+        }()
+    
+    let endDatePicker: UIDatePicker = {
+            let picker = UIDatePicker()
+            picker.datePickerMode = .time
+            picker.preferredDatePickerStyle = .compact
+            picker.addTarget(self, action: #selector(dateChangedForStartTimer(_:)), for: .valueChanged)
+            picker.translatesAutoresizingMaskIntoConstraints = false
+            return picker
+        }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = UIColor(red: 242/255, green: 242/255, blue: 247/255,alpha: 1)
@@ -85,6 +125,13 @@ class EventSheetViewController: UIViewController, UITextFieldDelegate, UITextVie
         view.addSubview(textViewFirst)
         view.addSubview(textLabelView)
         
+        // Set up the field
+        
+        view.addSubview(startTimeTextField)
+        view.addSubview(endTimeTextField)
+        view.addSubview(startDatePicker)
+        view.addSubview(endDatePicker)
+        
         let tapGesture = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tapGesture)
         
@@ -103,6 +150,13 @@ class EventSheetViewController: UIViewController, UITextFieldDelegate, UITextVie
         dateTextField.inputAccessoryView = toolbar
         
         setupUI()
+        setUpUI()
+        
+//        try! realm.write {
+//            // Delete all objects from the realm.
+//            realm.deleteAll()
+//        }
+
     }
     
     // MARK: - Navigation
@@ -132,7 +186,7 @@ class EventSheetViewController: UIViewController, UITextFieldDelegate, UITextVie
             textViewFirst.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -200),
             
             
-            textLabelView.topAnchor.constraint(equalTo: dateTextField.bottomAnchor, constant: 100),
+            textLabelView.topAnchor.constraint(equalTo: endTimeTextField.bottomAnchor, constant: 50),
             textLabelView.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             textLabelView.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 20),
             textLabelView.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
@@ -140,11 +194,40 @@ class EventSheetViewController: UIViewController, UITextFieldDelegate, UITextVie
         ])
     }
     
+    func setUpUI() {
+        
+        NSLayoutConstraint.activate([
+            startTimeTextField.topAnchor.constraint(equalTo: dateTextField.bottomAnchor, constant: 10),
+            startTimeTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            startTimeTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            startTimeTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            startTimeTextField.heightAnchor.constraint(equalToConstant: 40),
+            
+            endDatePicker.topAnchor.constraint(equalTo: startTimeTextField.topAnchor, constant: 0),
+            endDatePicker.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            endDatePicker.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            
+            endTimeTextField.topAnchor.constraint(equalTo: startTimeTextField.bottomAnchor, constant: 10),
+            endTimeTextField.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            endTimeTextField.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+            endTimeTextField.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            endTimeTextField.heightAnchor.constraint(equalToConstant: 40),
+            
+            startDatePicker.topAnchor.constraint(equalTo: startTimeTextField.bottomAnchor, constant: 10),
+            startDatePicker.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: 10),
+            startDatePicker.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -10),
+        ])
+        
+    }
+    
     @objc func datePickerValueChanged(_ sender: UIDatePicker) {
         // Handle date changes if needed
         let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "MM/dd/yyyy" // Change the date format as needed
-        dateTextField.text = dateFormatter.string(from: sender.date)
+        dateFormatter.dateFormat = "dd/MM/yyyy" // Change the date format as needed
+        //dateTextField.text = dateFormatter.string(from: sender.date)
+        let aString = dateFormatter.string(from: sender.date)
+        dateTextField.text = aString
+       // print("Here the Data is printing from sender --> ",aString)
     }
     @objc func doneButtonTapped() {
         dateTextField.resignFirstResponder()
@@ -152,7 +235,10 @@ class EventSheetViewController: UIViewController, UITextFieldDelegate, UITextVie
     
     @objc func cancelButtonTapped() {
             self.dismiss(animated: true, completion: nil)
+       // [self.calendar, reloadData]
         }
+   
+    // MARK: -- ADD Button
     
     @objc func addButtonTapped() {
         var printingIT = textViewFirst.text
@@ -180,11 +266,13 @@ class EventSheetViewController: UIViewController, UITextFieldDelegate, UITextVie
         
         
         //CRUD: Create
-        let taskList = TaskFile()
+        let taskList = NewTask()
         taskList.title = titleTextField.text!
         taskList.location = locationTextField.text!
         taskList.selectedDate = dateTextField.text!
         taskList.textFieldView = textViewFirst.text!
+        taskList.startTime = startTime
+        taskList.endTime = endTime
         
         do {
             let realm = try Realm()
@@ -197,7 +285,11 @@ class EventSheetViewController: UIViewController, UITextFieldDelegate, UITextVie
         
         completionHandler?()
         
-        print(printingIT!)
+        
+        print("This is Starting Time", startTime)
+        print("This is ending time", endTime)
+        
+       // print(printingIT!)
         dismiss(animated: true, completion: nil)
         }
     
@@ -211,4 +303,22 @@ class EventSheetViewController: UIViewController, UITextFieldDelegate, UITextVie
         alert.view.tintColor = .red
         present(alert, animated: true, completion: nil)
     }
+    
+    @objc func dateChanged(_ sender: UIDatePicker) {
+        let dateFormatter = DateFormatter()
+                dateFormatter.timeStyle = .short
+                let formattedDate = dateFormatter.string(from: sender.date)
+              print(formattedDate)
+        endTimeTextField.text =  formattedDate
+        endTime = formattedDate
+    }
+    
+@objc func dateChangedForStartTimer(_ sender: UIDatePicker) {
+    let dateFormatter = DateFormatter()
+            dateFormatter.timeStyle = .short
+            let formattedDate = dateFormatter.string(from: sender.date)
+          print(formattedDate)
+    startTimeTextField.text =  formattedDate
+    startTime = formattedDate
+}
 }
